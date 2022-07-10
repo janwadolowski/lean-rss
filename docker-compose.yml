@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  backend:
+    container_name: rss_backend_gin
+
+    restart: on-failure
+    depends_on:
+      - "mongodb"
+  
+  mongodb:
+    container_name: articles_db_mongo
+    image: mongo:latest
+    hostname: lean-rss-mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - data-volume:/data/db
+    env_file:
+     - .env
+    restart: unless-stopped
+volumes:
+  data-volume:
