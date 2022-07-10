@@ -19,7 +19,7 @@ type articleParser interface {
 	url(url string) string
 	publishedTime(html goquery.Document) time.Time
 	scrappedTime(time time.Time) time.Time
-	parseArticle(html goquery.Document, url string, scraping_time time.Time, parser articleParser) models.Article
+	parseArticle(html goquery.Document, url string, scraping_time time.Time) models.Article
 }
 
 // The most general type of parser used by default for URLS,
@@ -249,13 +249,14 @@ func (parser AntywebParser) parseArticle(html goquery.Document, url string, scra
 	}
 }
 
-func ParseArticle(html goquery.Document, url string, scraping_time time.Time, parser articleParser) models.Article {
+func ParseArticle(html goquery.Document, url string, scraping_time time.Time) models.Article {
+	parser := mapProviderToParser(url)
 	return parser.parseArticle(html, url, scraping_time)
 }
 
 func mapProviderToParser(url string) articleParser {
 	providersDomain := justDomain(url)
-	providerToParserMapping := map[string]interface{}{
+	providerToParserMapping := map[string]articleParser{
 		"spidersweb.pl":     SpiderswebArticleParser{},
 		"thehackernews.com": TheHackerNewsParser{},
 		"antyweb.pl":        AntywebParser{},
